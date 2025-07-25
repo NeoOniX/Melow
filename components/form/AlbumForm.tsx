@@ -70,9 +70,6 @@ const albumFormSchema = z.object({
     )
     .optional(),
   tracks: z.any().optional(),
-  // tracks: z.instanceof(FileList).refine((files) => files.length > 0, {
-  //   message: "At least one track is required",
-  // }),
 });
 
 type TrackWithFile = Track & {

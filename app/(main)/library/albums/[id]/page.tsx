@@ -2,6 +2,7 @@ import AlbumDialog from "@/components/dialog/AlbumDialog";
 import TrackRow from "@/components/row/TrackRow";
 import PlayerClientButton from "@/components/ui/client-button";
 import { getAlbumById } from "@/lib/actions/album";
+import { getAllArtists } from "@/lib/actions/artist";
 import { ListPlus, Play } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,6 +41,9 @@ export default async function AlbumDetails({
   const { id } = await params;
   const albumRes = await getAlbumById(id);
   const album = albumRes.album;
+
+  const artistsRes = await getAllArtists();
+  const artists = artistsRes.artists || [];
 
   return (
     <>
@@ -94,7 +98,7 @@ export default async function AlbumDetails({
                   size={24}
                 />
               </PlayerClientButton>
-              <AlbumDialog album={album} />
+              <AlbumDialog album={album} artists={artists} />
             </div>
             <div className="flex-1 w-full flex flex-col gap-2 overflow-y-auto">
               {[...album.tracks]
@@ -163,7 +167,7 @@ export default async function AlbumDetails({
                     size={24}
                   />
                 </PlayerClientButton>
-                <AlbumDialog album={album} />
+                <AlbumDialog album={album} artists={artists} />
               </div>
             </div>
             <div className="flex-1 flex flex-col gap-4 overflow-y-auto px-6 pt-12 pb-20">

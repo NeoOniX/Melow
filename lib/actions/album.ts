@@ -280,6 +280,7 @@ export async function updateAlbum(
             title: track.title,
             duration: track.duration,
             position: index + 1,
+            artistId: track.artistId,
           },
         });
 
