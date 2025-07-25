@@ -85,10 +85,6 @@ export async function createUser(formData: FormData) {
       throw new Error("Role is required and must be USER or ADMIN");
     }
 
-    if (!image) {
-      throw new Error("File is required");
-    }
-
     // Password hashing
     const hashedPassword = await hash(password, 10);
 
@@ -101,24 +97,26 @@ export async function createUser(formData: FormData) {
       },
     });
 
-    // Convertit l’image en buffer
-    const imageBuffer = Buffer.from(await image.arrayBuffer());
+    if (image) {
+      // Convertit l’image en buffer
+      const imageBuffer = Buffer.from(await image.arrayBuffer());
 
-    // Redimensionne l'image en 512x512, carré, centrée, format JPEG
-    const resizedImage = await sharp(imageBuffer)
-      .resize(512, 512, { fit: "cover", position: "center" })
-      .jpeg({ quality: 80 })
-      .toBuffer();
+      // Redimensionne l'image en 512x512, carré, centrée, format JPEG
+      const resizedImage = await sharp(imageBuffer)
+        .resize(512, 512, { fit: "cover", position: "center" })
+        .jpeg({ quality: 80 })
+        .toBuffer();
 
-    // Crée le dossier s’il n'existe pas
-    const uploadDir = path.join(process.cwd(), "uploads/users");
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
+      // Crée le dossier s’il n'existe pas
+      const uploadDir = path.join(process.cwd(), "uploads/users");
+      if (!existsSync(uploadDir)) {
+        await mkdir(uploadDir, { recursive: true });
+      }
+
+      // Sauvegarde du fichier
+      const filePath = path.join(uploadDir, user.id + ".jpg");
+      await writeFile(filePath, resizedImage);
     }
-
-    // Sauvegarde du fichier
-    const filePath = path.join(uploadDir, user.id + ".jpg");
-    await writeFile(filePath, resizedImage);
 
     return { success: true, user };
   } catch (error: unknown) {
