@@ -13,9 +13,6 @@ COPY . .
 # Génère le client Prisma
 RUN npx prisma generate
 
-# Transpile le code TypeScript
-RUN npx esbuild next.config.ts --outfile=next.config.js --platform=node --format=cjs
-
 # Build Next.js en mode production
 RUN npm run build
 
@@ -30,6 +27,7 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/next.config.ts ./
 
 # Crée le dossier d'upload s'il n'existe pas
 RUN mkdir -p uploads
