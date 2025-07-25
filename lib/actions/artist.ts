@@ -109,7 +109,7 @@ export async function createArtist(formData: FormData) {
         .toBuffer();
 
       // Crée le dossier s’il n'existe pas
-      const uploadDir = path.join(process.cwd(), "public/uploads/artists");
+      const uploadDir = path.join(process.cwd(), "uploads/artists");
       if (!existsSync(uploadDir)) {
         await mkdir(uploadDir, { recursive: true });
       }
@@ -163,7 +163,7 @@ export async function updateArtist(id: string, formData: FormData) {
         .toBuffer();
 
       // Crée le dossier s’il n'existe pas
-      const uploadDir = path.join(process.cwd(), "public/uploads/artists");
+      const uploadDir = path.join(process.cwd(), "uploads/artists");
       if (!existsSync(uploadDir)) {
         await mkdir(uploadDir, { recursive: true });
       }
@@ -197,11 +197,7 @@ export async function deleteArtist(id: string) {
     await Promise.all(deletePromises);
 
     // Supprime l'image de l'artiste
-    const filePath = path.join(
-      process.cwd(),
-      "public/uploads/artists",
-      id + ".jpg"
-    );
+    const filePath = path.join(process.cwd(), "uploads/artists", id + ".jpg");
     if (existsSync(filePath)) {
       await unlink(filePath);
     }

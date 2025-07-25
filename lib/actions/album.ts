@@ -156,7 +156,7 @@ export async function createAlbum(
       .toBuffer();
 
     // Crée le dossier s’il n'existe pas
-    const uploadDir = path.join(process.cwd(), "public/uploads/albums");
+    const uploadDir = path.join(process.cwd(), "/uploads/albums");
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });
     }
@@ -182,11 +182,7 @@ export async function createAlbum(
         },
       });
 
-      const trackPath = path.join(
-        process.cwd(),
-        "public/uploads/tracks",
-        dbTrack.id
-      );
+      const trackPath = path.join(process.cwd(), "uploads/tracks", dbTrack.id);
       if (!existsSync(path.dirname(trackPath))) {
         await mkdir(path.dirname(trackPath), { recursive: true });
       }
@@ -258,7 +254,7 @@ export async function updateAlbum(
         .toBuffer();
 
       // Crée le dossier s’il n'existe pas
-      const uploadDir = path.join(process.cwd(), "public/uploads/albums");
+      const uploadDir = path.join(process.cwd(), "uploads/albums");
       if (!existsSync(uploadDir)) {
         await mkdir(uploadDir, { recursive: true });
       }
@@ -306,7 +302,7 @@ export async function updateAlbum(
 
         const trackPath = path.join(
           process.cwd(),
-          "public/uploads/tracks",
+          "uploads/tracks",
           dbTrack.id
         );
         if (!existsSync(path.dirname(trackPath))) {
@@ -364,11 +360,7 @@ export async function deleteAlbum(id: string) {
     });
 
     const trackPromises = tracks.map(async (track) => {
-      const trackPath = path.join(
-        process.cwd(),
-        "public/uploads/tracks",
-        track.id
-      );
+      const trackPath = path.join(process.cwd(), "uploads/tracks", track.id);
       if (existsSync(trackPath)) {
         await unlink(trackPath);
       }
@@ -378,11 +370,7 @@ export async function deleteAlbum(id: string) {
     await Promise.all(trackPromises);
 
     // Supprime l'image de l'album
-    const filePath = path.join(
-      process.cwd(),
-      "public/uploads/albums",
-      id + ".jpg"
-    );
+    const filePath = path.join(process.cwd(), "uploads/albums", id + ".jpg");
     if (existsSync(filePath)) {
       await unlink(filePath);
     }

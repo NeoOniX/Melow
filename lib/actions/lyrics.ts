@@ -12,11 +12,7 @@ export type Lyrics = {
 
 export async function reloadLyrics(trackId: string): Promise<Lyrics> {
   // Supprimer le fichier de paroles existant
-  const filePath = path.join(
-    process.cwd(),
-    "public/uploads/lyrics",
-    `${trackId}.lrc`
-  );
+  const filePath = path.join(process.cwd(), "uploads/lyrics", `${trackId}.lrc`);
   if (existsSync(filePath)) {
     await unlink(filePath);
   }
@@ -45,7 +41,7 @@ export async function getLyrics(trackId: string): Promise<Lyrics> {
   if (!track) return { type: "none", content: "" };
 
   // Créer le répertoire si nécessaire, retourne null si le répertoire n'existe pas
-  const uploadDir = path.join(process.cwd(), "public/uploads/lyrics");
+  const uploadDir = path.join(process.cwd(), "uploads/lyrics");
   if (!existsSync(uploadDir)) {
     await mkdir(uploadDir, { recursive: true });
     return { type: "none", content: "" };

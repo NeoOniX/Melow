@@ -29,7 +29,7 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
 
 # Crée le dossier d'upload s'il n'existe pas
-RUN mkdir -p public/uploads
+RUN mkdir -p uploads
 
 # Définir la variable d'environnement pour Next.js
 ENV NODE_ENV=production

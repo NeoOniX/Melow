@@ -6,7 +6,7 @@ services:
     ports:
       - "3003:3000"
     volumes:
-      - melow-app-data:/app/public/uploads
+      - melow-app-data:/app/uploads
     environment:
       DATABASE_URL: postgres://melow-user:melow-pass@melow-db:5432/melow
     depends_on:

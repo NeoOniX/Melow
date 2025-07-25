@@ -70,6 +70,7 @@ export async function createUser(formData: FormData) {
   try {
     const name = formData.get("name")?.toString().trim();
     const password = formData.get("password")?.toString().trim();
+    const role = formData.get("role")?.toString().trim();
     const image = formData.get("image") as File | null;
 
     if (!name) {
@@ -78,6 +79,10 @@ export async function createUser(formData: FormData) {
 
     if (!password) {
       throw new Error("Password is required");
+    }
+
+    if (!role || (role !== "USER" && role !== "ADMIN")) {
+      throw new Error("Role is required and must be USER or ADMIN");
     }
 
     if (!image) {
@@ -91,6 +96,7 @@ export async function createUser(formData: FormData) {
     const user = await prisma.user.create({
       data: {
         name,
+        role: role,
         password: hashedPassword,
       },
     });
@@ -105,7 +111,7 @@ export async function createUser(formData: FormData) {
       .toBuffer();
 
     // Crée le dossier s’il n'existe pas
-    const uploadDir = path.join(process.cwd(), "public/uploads/users");
+    const uploadDir = path.join(process.cwd(), "uploads/users");
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });
     }
@@ -169,7 +175,7 @@ export async function updateUser(userId: string, formData: FormData) {
         .toBuffer();
 
       // Crée le dossier s’il n'existe pas
-      const uploadDir = path.join(process.cwd(), "public/uploads/users");
+      const uploadDir = path.join(process.cwd(), "uploads/users");
       if (!existsSync(uploadDir)) {
         await mkdir(uploadDir, { recursive: true });
       }
@@ -200,11 +206,7 @@ export async function deleteUser(userId: string) {
     });
 
     // Delete user image file
-    const filePath = path.join(
-      process.cwd(),
-      "public/uploads/users",
-      userId + ".jpg"
-    );
+    const filePath = path.join(process.cwd(), "uploads/users", userId + ".jpg");
     if (existsSync(filePath)) {
       await unlink(filePath);
     }
