@@ -1,0 +1,46 @@
+services:
+  melow-db:
+    image: postgres:16
+    container_name: melow-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U melow-user"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+      POSTGRES_DB: melow
+      POSTGRES_USER: melow-user
+      POSTGRES_PASSWORD: melow-pass
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - melow-database-data:/var/lib/postgresql/data
+    networks:
+      - melow
+
+  melow-pgadmin:
+    image: dpage/pgadmin4
+    container_name: melow-pgadmin
+    links:
+      - melow-db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@oneastudio.fr
+      PGADMIN_DEFAULT_PASSWORD: admin
+    restart: always
+    ports:
+      - "8081:80"
+    depends_on:
+      - melow-db
+    volumes:
+      - melow-pgadmin-data:/var/lib/pgadmin
+    networks:
+      - melow
+
+volumes:
+  melow-database-data:
+  melow-pgadmin-data:
+  melow-api-data:
+
+networks:
+  melow:

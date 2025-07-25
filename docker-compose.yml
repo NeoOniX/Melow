@@ -1,0 +1,41 @@
+services:
+  melow-app:
+    build:
+      context: .
+    container_name: melow-app
+    ports:
+      - "3003:3000"
+    volumes:
+      - melow-app-data:/app/public/uploads
+    environment:
+      DATABASE_URL: postgres://melow-user:melow-pass@melow-db:5432/melow
+    depends_on:
+      melow-db:
+        condition: service_healthy
+    networks:
+      - melow
+
+  melow-db:
+    image: postgres:16
+    container_name: melow-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U melow-user"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+      POSTGRES_DB: melow
+      POSTGRES_USER: melow-user
+      POSTGRES_PASSWORD: melow-pass
+    restart: always
+    volumes:
+      - melow-database-data:/var/lib/postgresql/data
+    networks:
+      - melow
+
+volumes:
+  melow-database-data:
+  melow-app-data:
+
+networks:
+  melow:
