@@ -4,7 +4,7 @@ import path from "path";
 
 export async function GET(
   req: Request,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   const { path: pathSegments } = await params;
   const filePath = path.join(process.cwd(), "uploads", ...pathSegments);
