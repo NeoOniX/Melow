@@ -116,7 +116,7 @@ export async function createArtist(formData: FormData) {
 
       // Sauvegarde du fichier
       const filePath = path.join(uploadDir, artist.id + ".jpg");
-      await writeFile(filePath, resizedImage);
+      await writeFile(filePath, resizedImage, { flag: "wx" });
 
       return { success: true, artist };
     } catch (fileError) {
@@ -170,7 +170,7 @@ export async function updateArtist(id: string, formData: FormData) {
 
       // Sauvegarde du fichier
       const filePath = path.join(uploadDir, artist.id + ".jpg");
-      await writeFile(filePath, resizedImage);
+      await writeFile(filePath, resizedImage, { flag: "wx" });
     }
 
     return { success: true, artist };
