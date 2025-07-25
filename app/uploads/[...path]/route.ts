@@ -7,7 +7,14 @@ export async function GET(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const { path: pathSegments } = await params;
-  const filePath = path.join(process.cwd(), "uploads", ...pathSegments);
+
+  const segments = [...pathSegments];
+  const lastSegment = segments.pop() ?? "";
+  const cleanLast = lastSegment.split("?")[0];
+
+  const filePath = path.join(process.cwd(), "uploads", ...segments, cleanLast);
+
+  console.log(filePath);
 
   if (!fs.existsSync(filePath)) {
     return new NextResponse("Not found", { status: 404 });
