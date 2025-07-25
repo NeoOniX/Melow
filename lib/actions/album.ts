@@ -163,7 +163,7 @@ export async function createAlbum(
 
     // Sauvegarde du fichier
     const filePath = path.join(uploadDir, album.id + ".jpg");
-    await writeFile(filePath, resizedImage, { flag: "wx" });
+    await writeFile(filePath, resizedImage);
 
     // Crée les pistes de l'album dans la base
 
@@ -190,9 +190,7 @@ export async function createAlbum(
       if (!existsSync(path.dirname(trackPath))) {
         await mkdir(path.dirname(trackPath), { recursive: true });
       }
-      await writeFile(trackPath, Buffer.from(await track.file.arrayBuffer()), {
-        flag: "wx",
-      });
+      await writeFile(trackPath, Buffer.from(await track.file.arrayBuffer()));
 
       return;
     });
@@ -267,7 +265,7 @@ export async function updateAlbum(
 
       // Sauvegarde du fichier
       const filePath = path.join(uploadDir, album.id + ".jpg");
-      await writeFile(filePath, resizedImage, { flag: "wx" });
+      await writeFile(filePath, resizedImage);
     }
 
     const afterEditTracks = [] as Track[];
@@ -314,11 +312,7 @@ export async function updateAlbum(
         if (!existsSync(path.dirname(trackPath))) {
           await mkdir(path.dirname(trackPath), { recursive: true });
         }
-        await writeFile(
-          trackPath,
-          Buffer.from(await track.file.arrayBuffer()),
-          { flag: "wx" }
-        );
+        await writeFile(trackPath, Buffer.from(await track.file.arrayBuffer()));
 
         afterEditTracks.push(dbTrack);
       }

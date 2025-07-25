@@ -112,7 +112,7 @@ export async function createUser(formData: FormData) {
 
     // Sauvegarde du fichier
     const filePath = path.join(uploadDir, user.id + ".jpg");
-    await writeFile(filePath, resizedImage, { flag: "wx" });
+    await writeFile(filePath, resizedImage);
 
     return { success: true, user };
   } catch (error: unknown) {
@@ -176,7 +176,7 @@ export async function updateUser(userId: string, formData: FormData) {
 
       // Sauvegarde du fichier
       const filePath = path.join(uploadDir, user.id + ".jpg");
-      await writeFile(filePath, resizedImage, { flag: "wx" });
+      await writeFile(filePath, resizedImage);
     }
 
     return { success: true, user };
