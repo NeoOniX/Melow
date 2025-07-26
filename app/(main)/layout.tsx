@@ -30,7 +30,7 @@ export default async function Layout({
           <div className="absolute top-2 right-2 z-30">
             <ModeToggle />
           </div>
-          <div className="h-full overflow-y-auto">{children}</div>
+          <div className="h-full pb-16">{children}</div>
         </main>
       </SidebarProvider>
       <PlayerBar />

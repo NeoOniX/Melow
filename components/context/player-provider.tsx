@@ -59,6 +59,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     "minimized" | "immersive" | "tracklist" | "lyrics"
   >("minimized");
 
+  // Initial state, loading from localStorage
   useEffect(() => {
     const savedVolume = localStorage.getItem("player_volume");
     const savedShuffle = localStorage.getItem("player_shuffle");
@@ -99,10 +100,24 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
+  // Update playerRef whenever player changes
   useEffect(() => {
     playerRef.current = player;
   }, [player]);
 
+  // Update currentTIme every 500ms
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const time = soundRef.current?.seek() as number;
+      if (!isNaN(time)) {
+        setCurrentTime(time);
+        updatePositionState();
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Player functions
   const playTrack = (
     track: TrackWithAlbumAndArtist,
     trackList?: TrackWithAlbumAndArtist[],
@@ -147,15 +162,9 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       shuffle: playerRef.current?.shuffle || false,
       repeat: playerRef.current?.repeat || false,
     });
-  };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const time = soundRef.current?.seek() as number;
-      if (!isNaN(time)) setCurrentTime(time);
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
+    updateMediaSession(track);
+  };
 
   const pause = () => {
     soundRef.current?.pause();
@@ -266,10 +275,40 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     playTrack(player.trackList[prevIndex], player.trackList, prevIndex);
   };
 
+  const previousWithPlayer = (currentPlayer: PlayerData) => {
+    const currentSeek = soundRef.current?.seek() as number;
+
+    if (currentSeek > 10) {
+      // Si plus de 10 secondes, on remet au début de la piste
+      soundRef.current?.seek(0);
+      setCurrentTime(0);
+      setPlayer((prev) => (prev ? { ...prev, currentTime: 0 } : null));
+      return;
+    }
+
+    // Sinon on passe à la piste précédente
+    let prevIndex = currentPlayer.currentTrackIndex - 1;
+
+    if (prevIndex < 0) {
+      if (currentPlayer.repeat) {
+        prevIndex = currentPlayer.trackList.length - 1;
+      } else {
+        return;
+      }
+    }
+
+    playTrack(
+      currentPlayer.trackList[prevIndex],
+      currentPlayer.trackList,
+      prevIndex
+    );
+  };
+
   const seek = (time: number) => {
     if (soundRef.current?.state() === "loaded") {
       soundRef.current?.seek(time);
       setPlayer((prev) => (prev ? { ...prev, currentTime: time } : null));
+      updatePositionState();
     }
   };
 
@@ -322,6 +361,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  // Set volume and update localStorage
   useEffect(() => {
     soundRef.current?.volume(currentVolume);
     Howler.volume(currentVolume);
@@ -329,6 +369,59 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setPlayer((prev) => (prev ? { ...prev, volume: currentVolume } : null));
   }, [currentVolume]);
+
+  // Media Session API for better media controls
+  const updateMediaSession = (track: TrackWithAlbumAndArtist) => {
+    if (!("mediaSession" in navigator)) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.artist.name,
+      album: track.album.title || "",
+      artwork: [
+        {
+          src: `/uploads/albums/${track.album.id}.jpg`,
+          sizes: "512x512",
+          type: "image/jpeg",
+        },
+      ],
+    });
+
+    navigator.mediaSession.setActionHandler("play", resume);
+    navigator.mediaSession.setActionHandler("pause", pause);
+    navigator.mediaSession.setActionHandler("seekto", (details) => {
+      seek(details.seekTime ?? 0);
+    });
+
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      const currentPlayer = playerRef.current;
+      if (currentPlayer) {
+        previousWithPlayer(currentPlayer);
+      }
+    });
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+      const currentPlayer = playerRef.current;
+      if (currentPlayer) {
+        nextWithPlayer(currentPlayer);
+      }
+    });
+
+    updatePositionState();
+  };
+
+  const updatePositionState = () => {
+    if (
+      "mediaSession" in navigator &&
+      navigator.mediaSession.setPositionState &&
+      soundRef.current
+    ) {
+      navigator.mediaSession.setPositionState({
+        duration: soundRef.current.duration(),
+        position: soundRef.current.seek() as number,
+        playbackRate: 1,
+      });
+    }
+  };
 
   return (
     <PlayerContext.Provider

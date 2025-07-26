@@ -458,69 +458,69 @@ export default function PlayerBar() {
       </div>
       <div className="fixed bottom-0 left-0 right-0 h-16 z-40 bg-stone-50 dark:bg-stone-950 border-t-2 border-stone-200 dark:border-stone-800 flex items-stretch p-2">
         {/* Song Controls */}
-        <div className="flex items-center gap-1 ml-4">
+        <div className="flex items-center gap-0.5 md:gap-1 ml-0 md:ml-4">
           <button
-            className="flex items-center justify-center text-white text-xl cursor-pointer p-2"
+            className="flex items-center justify-center text-white text-xl cursor-pointer p-1 md:p-2"
             onClick={toggleShuffle}
           >
             <Shuffle
-              size={20}
               className={
-                player?.shuffle
+                "h-4 md:h-5 w-4 md:w-5 " +
+                (player?.shuffle
                   ? "stroke-[#fd7200]"
-                  : "stroke-stone-800 dark:stroke-white"
+                  : "stroke-stone-800 dark:stroke-white")
               }
             />
           </button>
           <button
-            className="flex items-center justify-center text-white text-xl cursor-pointer p-2"
+            className="flex items-center justify-center text-white text-xl cursor-pointer p-1 md:p-2"
             onClick={previous}
           >
-            <SkipBack
-              size={20}
-              className="stroke-stone-800 dark:stroke-white"
-            />
+            <SkipBack className="h-5 w-5 stroke-stone-800 dark:stroke-white" />
           </button>
           <button
-            className="flex items-center justify-center text-white text-xl cursor-pointer p-2"
+            className="flex items-center justify-center text-white text-xl cursor-pointer p-1 md:p-2"
             onClick={handlePlayPause}
           >
             {player?.state === "playing" && (
-              <Pause size={28} className="stroke-stone-800 dark:stroke-white" />
+              <Pause
+                size={28}
+                className="h-6 md:h-7 w-6 md:w-7 stroke-stone-800 dark:stroke-white"
+              />
             )}
             {player?.state !== "playing" && (
-              <Play size={28} className="stroke-stone-800 dark:stroke-white" />
+              <Play
+                size={28}
+                className="h-6 md:h-7 w-6 md:w-7 stroke-stone-800 dark:stroke-white"
+              />
             )}
           </button>
           <button
-            className="flex items-center justify-center text-white text-xl cursor-pointer p-2"
+            className="flex items-center justify-center text-white text-xl cursor-pointer p-1 md:p-2"
             onClick={next}
           >
-            <SkipForward
-              size={20}
-              className="stroke-stone-800 dark:stroke-white"
-            />
+            <SkipForward className="h-5 w-5 stroke-stone-800 dark:stroke-white" />
           </button>
           <button
-            className="flex items-center justify-center text-white text-xl cursor-pointer p-2"
+            className="flex items-center justify-center text-white text-xl cursor-pointer p-1 md:p-2"
             onClick={toggleRepeat}
           >
             <Repeat
-              size={20}
               className={
-                player?.repeat
+                "h-4 md:h-5 w-4 md:w-5 " +
+                (player?.repeat
                   ? "stroke-[#fd7200]"
-                  : "stroke-stone-800 dark:stroke-white"
+                  : "stroke-stone-800 dark:stroke-white")
               }
             />
           </button>
           {player && currentTrack && (
             <>
-              <p className="text-stone-600 dark:text-stone-300 text-sm ms-4">
+              <p className="text-stone-600 dark:text-stone-300 text-sm ms-2 md:ms-4">
                 {formatDuration(currentTime)}
               </p>
               <p className="text-stone-600 dark:text-stone-300 text-sm">:</p>
-              <p className="text-stone-600 dark:text-stone-300 text-sm me-2">
+              <p className="text-stone-600 dark:text-stone-300 text-sm me-0 md:me-2">
                 {formatDuration(currentTrack.duration)}
               </p>
             </>
@@ -568,8 +568,8 @@ export default function PlayerBar() {
 
         {/* Display  */}
         <div className="flex items-center justify-end">
-          <button className="flex items-center cursor-pointer p-2">
-            <Volume size={20} className="stroke-stone-800 dark:stroke-white" />
+          <button className="flex items-center cursor-pointer p-1 md:p-2">
+            <Volume className="h-4 md:h-5 w-4 md:w-5 stroke-stone-800 dark:stroke-white" />
           </button>
           <input
             type="range"
@@ -581,7 +581,7 @@ export default function PlayerBar() {
               const newVolume = parseFloat(e.target.value);
               setVolume(newVolume);
             }}
-            className="w-24 h-1 bg-stone-800 rounded-md cursor-pointer appearance-none
+            className="w-10 md:w-24 h-1 bg-stone-800 rounded-md cursor-pointer appearance-none
             accent-[#fd7200] 
             [&::-webkit-slider-thumb]:appearance-none
             [&::-moz-range-thumb]:appearance-none
@@ -602,41 +602,41 @@ export default function PlayerBar() {
             }}
           />
           <button
-            className="flex items-center text-white text-xl cursor-pointer p-2 ms-4"
+            className="flex items-center text-white text-xl cursor-pointer p-1 md:p-2 ms-0 md:ms-4"
             onClick={() => handleViewChange("tracklist")}
           >
             <ListMusic
-              size={24}
               className={
-                view === "tracklist"
+                "h-4 md:h-6 w-4 md:w-6 " +
+                (view === "tracklist"
                   ? "stroke-[#fd7200]"
-                  : "stroke-stone-800 dark:stroke-white"
+                  : "stroke-stone-800 dark:stroke-white")
               }
             />
           </button>
           <button
-            className="flex items-center text-white text-xl cursor-pointer p-2"
+            className="flex items-center text-white text-xl cursor-pointer p-1 md:p-2"
             onClick={() => handleViewChange("lyrics")}
           >
             <MicVocal
-              size={24}
               className={
-                view === "lyrics"
+                "h-4 md:h-6 w-4 md:w-6 " +
+                (view === "lyrics"
                   ? "stroke-[#fd7200]"
-                  : "stroke-stone-800 dark:stroke-white"
+                  : "stroke-stone-800 dark:stroke-white")
               }
             />
           </button>
           <button
-            className="flex items-center text-white text-xl cursor-pointer p-2"
+            className="flex items-center text-white text-xl cursor-pointer p-1 md:p-2"
             onClick={() => handleViewChange("immersive")}
           >
             <Disc3
-              size={24}
               className={
-                view === "immersive"
+                "h-4 md:h-6 w-4 md:w-6 " +
+                (view === "immersive"
                   ? "stroke-[#fd7200]"
-                  : "stroke-stone-800 dark:stroke-white"
+                  : "stroke-stone-800 dark:stroke-white")
               }
             />
           </button>

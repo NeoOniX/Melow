@@ -478,7 +478,7 @@ export default function AlbumForm({
   }
 
   return (
-    <Card className="w-full max-w-3/5 max-h-5/6 overflow-y-auto">
+    <Card className="w-full max-w-full md:max-w-3/5 max-h-5/6 overflow-y-auto">
       <CardHeader>
         <CardTitle>
           {mode === "create" ? "Create album" : "Edit album"}

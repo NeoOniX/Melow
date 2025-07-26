@@ -50,7 +50,7 @@ export default async function AlbumDetails({
       {album && (
         <>
           {/* Small display */}
-          <div className="lg:hidden relative z-10 flex p-4 flex-col gap-2 h-full items-center">
+          <div className="lg:hidden relative z-10 flex p-4 flex-col gap-2 h-full items-center overflow-y-auto">
             <h1 className="text-2xl lg:text-3xl font-bold text-white">
               {album.title}
             </h1>
@@ -100,7 +100,7 @@ export default async function AlbumDetails({
               </PlayerClientButton>
               <AlbumDialog album={album} artists={artists} />
             </div>
-            <div className="flex-1 w-full flex flex-col gap-2 overflow-y-auto">
+            <div className="flex-1 w-full flex flex-col gap-2">
               {[...album.tracks]
                 .sort((a, b) => a.position - b.position)
                 .map((track, index) => (

@@ -46,7 +46,7 @@ export default async function ArtistDetailsPage({
     <>
       {artistRes.success && artist && (
         <>
-          <div className="relative z-10 flex p-4 flex-col gap-4 h-full items-center">
+          <div className="relative z-10 flex p-4 flex-col gap-4 h-full items-center overflow-y-auto">
             <div className="flex flex-row items-center gap-4">
               <h1 className="text-3xl font-bold">{artist.name}</h1>
               <ArtistDialog artist={artist} />

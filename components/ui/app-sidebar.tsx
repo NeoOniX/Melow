@@ -107,7 +107,7 @@ export async function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="mb-18">
+      <SidebarFooter className="mb-0 md:mb-18">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
