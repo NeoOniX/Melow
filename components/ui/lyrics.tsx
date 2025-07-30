@@ -239,11 +239,15 @@ export default function LyricsWindows({
       ) : showText && lyrics?.plainLyrics ? (
         <div
           ref={lyricsTextContainerRef}
-          className={`h-full w-full flex flex-col px-4 py-12 space-y-1 text-sm md:text-xl lg:text-2xl text-stone-200 overflow-y-auto ${
-            isCentered ? "justify-center items-center" : "justify-start"
-          }`}
+          className={`h-full w-full overflow-y-auto px-4 py-12 space-y-1 text-sm md:text-xl lg:text-2xl text-stone-200`}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: isCentered ? "center" : "flex-start",
+            alignItems: isCentered ? "center" : "stretch",
+          }}
         >
-          <div ref={lyricsTextContentRef}>
+          <div ref={lyricsTextContentRef} className="flex flex-col">
             {lyrics.plainLyrics.split("\n").map((line, index) => (
               <p key={index} className="text-center">
                 {line}
