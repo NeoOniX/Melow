@@ -3,6 +3,7 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
 import { Howl, Howler } from "howler";
 import { TrackWithAlbumAndArtist } from "@/lib/actions/track";
+import { LyricsType } from "@/lib/actions/lyrics";
 
 type PlayerData = {
   songId: string;
@@ -20,6 +21,10 @@ type PlayerContextType = {
   player: PlayerData | null;
   view: "minimized" | "immersive" | "tracklist" | "lyrics";
   setView: (view: "minimized" | "immersive" | "tracklist" | "lyrics") => void;
+  lyricsMode: LyricsType;
+  setLyricsMode: (mode: LyricsType) => void;
+  lyricsOffset: number;
+  setLyricsOffset: (offset: number) => void;
   playTrack: (
     track: TrackWithAlbumAndArtist,
     trackList?: TrackWithAlbumAndArtist[]
@@ -59,13 +64,29 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     "minimized" | "immersive" | "tracklist" | "lyrics"
   >("minimized");
 
+  const [lyricsMode, setLyricsModeLocal] = useState<LyricsType>("lrc");
+  const [lyricsOffset, setLyricsOffsetLocal] = useState<number>(0);
+
   // Initial state, loading from localStorage
   useEffect(() => {
     const savedVolume = localStorage.getItem("player_volume");
     const savedShuffle = localStorage.getItem("player_shuffle");
     const savedRepeat = localStorage.getItem("player_repeat");
+    const savedLyricsMode = localStorage.getItem("player_lyrics_mode");
+    const savedLyricsOffset = localStorage.getItem("player_lyrics_offset");
 
     if (savedVolume !== null) setVolume(parseFloat(savedVolume));
+    if (savedLyricsMode) {
+      setLyricsModeLocal(savedLyricsMode as LyricsType);
+    } else {
+      setLyricsModeLocal("lrc");
+    }
+    if (savedLyricsOffset) {
+      setLyricsOffsetLocal(parseInt(savedLyricsOffset));
+    } else {
+      setLyricsOffsetLocal(0);
+    }
+
     if (savedShuffle !== null) {
       setPlayer((prev) => ({
         ...(prev || {
@@ -116,6 +137,17 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     }, 500);
     return () => clearInterval(interval);
   }, []);
+
+  // Lyrics functions
+  const setLyricsMode = (mode: LyricsType) => {
+    setLyricsModeLocal(mode);
+    localStorage.setItem("player_lyrics_mode", mode);
+  };
+
+  const setLyricsOffset = (offset: number) => {
+    setLyricsOffsetLocal(offset);
+    localStorage.setItem("player_lyrics_offset", offset.toString());
+  };
 
   // Player functions
   const playTrack = (
@@ -429,6 +461,10 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
         player,
         view,
         setView,
+        lyricsMode,
+        setLyricsMode,
+        lyricsOffset,
+        setLyricsOffset,
         playTrack,
         pause,
         resume,

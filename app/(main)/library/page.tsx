@@ -47,7 +47,7 @@ export default async function LibraryPage() {
         >
           {albums?.slice(0, 8).map((album) => (
             <Link key={album.id} href={`/library/albums/${album.id}`}>
-              <Card className="p-4 pb-2">
+              <Card className="p-4 pb-2 h-full">
                 <CardContent className="p-0 flex flex-col items-center gap-2">
                   <Image
                     height={132}
@@ -65,14 +65,16 @@ export default async function LibraryPage() {
               </Card>
             </Link>
           ))}
-        </div>
-        {albums && albums.length > 8 && (
-          <div className="flex items-center justify-center">
-            <Link href={"/library/albums"} className="p-2">
-              <Ellipsis size={32} color="white" />
+          {albums && albums.length > 8 && (
+            <Link href={"/library/albums"}>
+              <Card className="p-4 pb-2 h-full">
+                <CardContent className="p-0 h-full flex flex-col items-center justify-center">
+                  <Ellipsis size={32} color="white" />
+                </CardContent>
+              </Card>
             </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       <div className="flex flex-row gap-2 items-center">
         <div className="flex-1 flex justify-start">
@@ -115,14 +117,16 @@ export default async function LibraryPage() {
               </Card>
             </Link>
           ))}
-        </div>
-        {artists && artists.length > 8 && (
-          <div className="flex items-center justify-center">
-            <Link href={"/library/artists"} className="p-2">
-              <Ellipsis size={32} color="white" />
+          {artists && artists.length > 8 && (
+            <Link href={"/library/artists"}>
+              <Card className="p-4 pb-2 h-full">
+                <CardContent className="p-0 h-full flex flex-col items-center justify-center">
+                  <Ellipsis size={32} color="white" />
+                </CardContent>
+              </Card>
             </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

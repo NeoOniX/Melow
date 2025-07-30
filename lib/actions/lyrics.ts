@@ -5,9 +5,11 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import prisma from "../prisma";
 
+export type LyricsType = "lrc" | "text" | "none";
+
 export type Lyrics = {
-  type: "lrc" | "text" | "none";
-  content: string;
+  syncedLyrics?: string;
+  plainLyrics?: string;
 };
 
 export async function reloadLyrics(trackId: string): Promise<Lyrics> {
@@ -23,7 +25,7 @@ export async function reloadLyrics(trackId: string): Promise<Lyrics> {
 }
 
 export async function getLyrics(trackId: string): Promise<Lyrics> {
-  if (!trackId) return { type: "none", content: "" };
+  if (!trackId) return {};
 
   // Récupération des informations de la piste
   const track = await prisma.track.findUnique({
@@ -38,13 +40,12 @@ export async function getLyrics(trackId: string): Promise<Lyrics> {
     },
   });
 
-  if (!track) return { type: "none", content: "" };
+  if (!track) return {};
 
-  // Créer le répertoire si nécessaire, retourne null si le répertoire n'existe pas
+  // Créer le répertoire si nécessaire
   const uploadDir = path.join(process.cwd(), "uploads/lyrics");
   if (!existsSync(uploadDir)) {
     await mkdir(uploadDir, { recursive: true });
-    return { type: "none", content: "" };
   }
 
   // Chemin du fichier de paroles
@@ -52,7 +53,7 @@ export async function getLyrics(trackId: string): Promise<Lyrics> {
 
   // Si le fichier n'existe pas : cherche sur LRCLib
   if (!existsSync(filePath)) {
-    console.log("Fecthing lyrics from LRCLib for track:", track.title);
+    console.log("Fetching lyrics (GET) from LRCLib for track:", track.title);
 
     const getRes = await fetch(
       `https://lrclib.net/api/get?artist_name=${encodeURIComponent(
@@ -73,36 +74,29 @@ export async function getLyrics(trackId: string): Promise<Lyrics> {
     if (getRes.ok) {
       const data = await getRes.json();
 
+      // Créer un objet Lyrics pour stocker les paroles
+      const lyrics: Lyrics = {};
+
+      // Si des paroles synchronisées (LRC) sont trouvées, ajouter à l'objet lyrics
       if (data.syncedLyrics) {
-        // Si des paroles synchronisées (LRC) sont trouvées
-        const lyrics: Lyrics = {
-          type: "lrc",
-          content: data.syncedLyrics,
-        };
-
-        // Sauvegarde des paroles dans le fichier
-        await writeFile(filePath, JSON.stringify(lyrics), {
-          encoding: "utf-8",
-          flag: "wx",
-        });
-        return lyrics;
-      } else if (data.plainLyrics) {
-        // Si des paroles simples (texte) sont trouvées
-        const lyrics: Lyrics = {
-          type: "text",
-          content: data.plainLyrics,
-        };
-
-        // Sauvegarde des paroles dans le fichier
-        await writeFile(filePath, JSON.stringify(lyrics), {
-          encoding: "utf-8",
-          flag: "wx",
-        });
-        return lyrics;
+        lyrics.syncedLyrics = data.syncedLyrics;
       }
+
+      // Si des paroles simples (texte) sont trouvées
+      if (data.plainLyrics) {
+        lyrics.plainLyrics = data.plainLyrics;
+      }
+
+      // Sauvegarde des paroles dans le fichier
+      await writeFile(filePath, JSON.stringify(lyrics), {
+        encoding: "utf-8",
+        flag: "wx",
+      });
+      return lyrics;
     }
 
     // Refaire une requête en mode search, prendre le premier résultat
+    console.log("Fetching lyrics (SEARCH) from LRCLib for track:", track.title);
     const searchRes = await fetch(
       `https://lrclib.net/api/search?artist_name=${encodeURIComponent(
         track.artist.name
@@ -130,37 +124,31 @@ export async function getLyrics(trackId: string): Promise<Lyrics> {
           // Prendre le premier résultat
           const firstResult = matchingResults[0];
 
+          // Créer un objet Lyrics pour stocker les paroles
+          const lyrics: Lyrics = {};
+
+          // Si des paroles synchronisées sont disponibles
           if (firstResult.syncedLyrics) {
-            // Si des paroles synchronisées sont disponibles
-            const lyrics: Lyrics = {
-              type: "lrc",
-              content: firstResult.syncedLyrics,
-            };
-
-            await writeFile(filePath, JSON.stringify(lyrics), {
-              encoding: "utf-8",
-              flag: "wx",
-            });
-            return lyrics;
-          } else if (firstResult.plainLyrics) {
-            // Si des paroles simples sont disponibles
-            const lyrics: Lyrics = {
-              type: "text",
-              content: firstResult.plainLyrics,
-            };
-
-            await writeFile(filePath, JSON.stringify(lyrics), {
-              encoding: "utf-8",
-              flag: "wx",
-            });
-            return lyrics;
+            lyrics.syncedLyrics = firstResult.syncedLyrics;
           }
+
+          // Si des paroles simples sont disponibles
+          if (firstResult.plainLyrics) {
+            lyrics.plainLyrics = firstResult.plainLyrics;
+          }
+
+          // Sauvegarde des paroles dans le fichier
+          await writeFile(filePath, JSON.stringify(lyrics), {
+            encoding: "utf-8",
+            flag: "wx",
+          });
+          return lyrics;
         }
       }
     }
 
     // Si aucune parole n'est trouvée, retourner un type "none"
-    const lyrics: Lyrics = { type: "none", content: "" };
+    const lyrics: Lyrics = {};
     await writeFile(filePath, JSON.stringify(lyrics), {
       encoding: "utf-8",
       flag: "wx",
@@ -172,7 +160,7 @@ export async function getLyrics(trackId: string): Promise<Lyrics> {
       return lyrics || null;
     } catch (error) {
       console.error("Erreur lors de la récupération des paroles :", error);
-      return { type: "none", content: "" };
+      return {};
     }
   }
 }
