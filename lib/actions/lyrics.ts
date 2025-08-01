@@ -14,7 +14,11 @@ export type Lyrics = {
 
 export async function reloadLyrics(trackId: string): Promise<Lyrics> {
   // Supprimer le fichier de paroles existant
-  const filePath = path.join(process.cwd(), "uploads/lyrics", `${trackId}.lrc`);
+  const filePath = path.join(
+    process.cwd(),
+    "uploads/lyrics",
+    `${trackId}.json`
+  );
   if (existsSync(filePath)) {
     await unlink(filePath);
   }
@@ -49,7 +53,7 @@ export async function getLyrics(trackId: string): Promise<Lyrics> {
   }
 
   // Chemin du fichier de paroles
-  const filePath = path.join(uploadDir, `${track.id}.lrc`);
+  const filePath = path.join(uploadDir, `${track.id}.json`);
 
   // Si le fichier n'existe pas : cherche sur LRCLib
   if (!existsSync(filePath)) {
@@ -163,4 +167,32 @@ export async function getLyrics(trackId: string): Promise<Lyrics> {
       return {};
     }
   }
+}
+
+export async function updateLyrics(
+  trackId: string,
+  newLyrics: Lyrics
+): Promise<Lyrics> {
+  if (!trackId) return {};
+
+  // Chemin du fichier de paroles
+  const filePath = path.join(
+    process.cwd(),
+    "uploads/lyrics",
+    `${trackId}.json`
+  );
+
+  // Vérifier si le fichier existe
+  if (!existsSync(filePath)) {
+    console.warn("Le fichier de paroles n'existe pas :", filePath);
+    return {};
+  }
+
+  // Écrire les nouvelles paroles dans le fichier
+  await writeFile(filePath, JSON.stringify(newLyrics), {
+    encoding: "utf-8",
+    flag: "w",
+  });
+
+  return newLyrics;
 }

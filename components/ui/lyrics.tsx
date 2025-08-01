@@ -3,8 +3,9 @@
 import { Lyrics } from "@/lib/actions/lyrics";
 import { TrackWithAlbumAndArtist } from "@/lib/actions/track";
 import React, { useEffect, useRef, useState } from "react";
-import { BookOpenText, MicVocal, RefreshCw } from "lucide-react";
+import { BookOpenText, MicVocal, Pencil, RefreshCw } from "lucide-react";
 import { usePlayer } from "@/hooks/use-player";
+import LyricsEditDialog from "../dialog/LyricsEditDialog";
 
 type Line = { time: number; text: string };
 
@@ -35,6 +36,7 @@ export default function LyricsWindows({
   const [lyrics, setLyrics] = useState<Lyrics | null>(null);
   const [lines, setLines] = useState<Line[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const activeLineRef = useRef<HTMLParagraphElement | null>(null);
 
@@ -118,6 +120,15 @@ export default function LyricsWindows({
     return () => window.removeEventListener("resize", updateCentering);
   }, [lyrics]);
 
+  // Update lyrics modal
+  const handleLyricsUpdated = async (updatedLyrics: Lyrics) => {
+    const { updateLyrics } = await import("@/lib/actions/lyrics");
+    const lyrics = await updateLyrics(track.id, updatedLyrics);
+
+    setLyrics(lyrics);
+    setEditModalOpen(false);
+  };
+
   if (!lyrics) {
     return (
       <div className="text-center text-sm text-gray-500">Loading lyrics...</div>
@@ -126,31 +137,43 @@ export default function LyricsWindows({
 
   return (
     <>
+      <LyricsEditDialog
+        open={editModalOpen}
+        setOpen={setEditModalOpen}
+        lyrics={lyrics}
+        onLyricsUpdated={handleLyricsUpdated}
+      />
       <div className="fixed top-4 right-4 z-20 flex flex-row-reverse gap-2 group @container">
         <div className="flex flex-col items-center border p-0 m-0 rounded">
           <button
             className={
-              "w-10 h-10 flex items-center justify-center p-0.5 z-10 hover:bg-[#fd7200] cursor-pointer rounded-none rounded-tl rounded-tr" +
+              "w-6 md:w-10 h-6 md:h-10 flex items-center justify-center p-0.5 z-10 hover:bg-[#fd7200] cursor-pointer rounded-none rounded-tl rounded-tr" +
               (lyricsMode === "lrc" ? " bg-[#fd7200]" : "")
             }
             onClick={() => setLyricsMode("lrc")}
           >
-            <MicVocal size={20} />
+            <MicVocal className="h-4 md:h-5 w-4 md:w-5" />
           </button>
           <button
             className={
-              "w-10 h-10 flex items-center justify-center p-0.5 z-10 hover:bg-[#fd7200] cursor-pointer rounded-none" +
+              "w-6 md:w-10 h-6 md:h-10 flex items-center justify-center p-0.5 z-10 hover:bg-[#fd7200] cursor-pointer rounded-none" +
               (lyricsMode === "text" ? " bg-[#fd7200]" : "")
             }
             onClick={() => setLyricsMode("text")}
           >
-            <BookOpenText size={20} />
+            <BookOpenText className="h-4 md:h-5 w-4 md:w-5" />
           </button>
           <button
-            className="w-10 h-10 flex items-center justify-center p-0.5 z-10 hover:bg-[#fd7200] cursor-pointer rounded-none rounded-bl rounded-br"
+            className="w-6 md:w-10 h-6 md:h-10 flex items-center justify-center p-0.5 z-10 hover:bg-[#fd7200] cursor-pointer rounded-none rounded-bl rounded-br"
+            onClick={() => setEditModalOpen(true)}
+          >
+            <Pencil className="h-4 md:h-5 w-4 md:w-5" />
+          </button>
+          <button
+            className="w-6 md:w-10 h-6 md:h-10 flex items-center justify-center p-0.5 z-10 hover:bg-[#fd7200] cursor-pointer rounded-none rounded-bl rounded-br"
             onClick={handleReloadLyrics}
           >
-            <RefreshCw size={20} />
+            <RefreshCw className="h-4 md:h-5 w-4 md:w-5" />
           </button>
         </div>
         {lyricsMode === "lrc" && (
